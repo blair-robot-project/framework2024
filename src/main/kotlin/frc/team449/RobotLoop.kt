@@ -7,16 +7,9 @@ import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import frc.team449.control.holonomic.SwerveSim
 import frc.team449.robot2024.Robot
 import frc.team449.robot2024.auto.routines.RoutineChooser
-import frc.team449.robot2024.commands.PivotCalibration
-import frc.team449.robot2024.commands.light.BlairChasing
-import frc.team449.robot2024.commands.light.BreatheHue
-import frc.team449.robot2024.commands.light.Rainbow
 import frc.team449.robot2024.constants.field.FieldConstants
-import frc.team449.robot2024.constants.vision.VisionConstants
 import frc.team449.robot2024.subsystems.ControllerBindings
 import monologue.Annotations.Log
 import monologue.Logged
@@ -53,8 +46,6 @@ class RobotLoop : TimedRobot(), Logged {
 //      instance.startClient4("localhost")
     }
 
-    PivotCalibration(robot.pivot).ignoringDisable(true).schedule()
-
     println("Generating Auto Routines : ${Timer.getFPGATimestamp()}")
     routineMap = routineChooser.routineMap()
     println("DONE Generating Auto Routines : ${Timer.getFPGATimestamp()}")
@@ -62,7 +53,7 @@ class RobotLoop : TimedRobot(), Logged {
     SmartDashboard.putData("Routine Chooser", routineChooser)
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
 
-    robot.light.defaultCommand = BlairChasing(robot.light)
+//    robot.light.defaultCommand = BlairChasing(robot.light)
 
     controllerBinder.bindButtons()
 
@@ -88,13 +79,11 @@ class RobotLoop : TimedRobot(), Logged {
     this.autoCommand = routineMap[routineChooser.selected]
     CommandScheduler.getInstance().schedule(this.autoCommand)
 
-    robot.drive.enableVisionFusion = false
-
-    if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
-      BreatheHue(robot.light, 0).schedule()
-    } else {
-      BreatheHue(robot.light, 95).schedule()
-    }
+//    if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
+//      BreatheHue(robot.light, 0).schedule()
+//    } else {
+//      BreatheHue(robot.light, 95).schedule()
+//    }
 
     if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
       FieldConstants.SPEAKER_POSE = FieldConstants.RED_SPEAKER_POSE
@@ -116,9 +105,7 @@ class RobotLoop : TimedRobot(), Logged {
       CommandScheduler.getInstance().cancel(autoCommand)
     }
 
-    robot.drive.enableVisionFusion = true
-
-    (robot.light.currentCommand ?: InstantCommand()).cancel()
+//    (robot.light.currentCommand ?: InstantCommand()).cancel()
 
     robot.drive.defaultCommand = robot.driveCommand
 
@@ -141,10 +128,8 @@ class RobotLoop : TimedRobot(), Logged {
   override fun disabledInit() {
     robot.drive.stop()
 
-    robot.drive.enableVisionFusion = true
-
-    (robot.light.currentCommand ?: InstantCommand()).cancel()
-    Rainbow(robot.light).schedule()
+//    (robot.light.currentCommand ?: InstantCommand()).cancel()
+//    Rainbow(robot.light).schedule()
   }
 
   override fun disabledPeriodic() {
@@ -161,13 +146,5 @@ class RobotLoop : TimedRobot(), Logged {
 
   override fun simulationInit() {}
 
-  override fun simulationPeriodic() {
-    robot.drive as SwerveSim
-
-    VisionConstants.ESTIMATORS.forEach {
-      it.simulationPeriodic(robot.drive.odoPose)
-    }
-
-    VisionConstants.VISION_SIM.debugField.getObject("EstimatedRobot").pose = robot.drive.pose
-  }
+  override fun simulationPeriodic() {}
 }

@@ -13,23 +13,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.util.sendable.SendableBuilder
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase.isReal
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.control.vision.VisionSubsystem
 import frc.team449.robot2024.constants.RobotConstants
 import frc.team449.robot2024.constants.drives.SwerveConstants
-import frc.team449.robot2024.constants.vision.VisionConstants
 import frc.team449.system.AHRS
 import frc.team449.system.encoder.AbsoluteEncoder
 import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.createSparkMax
-import kotlin.math.abs
 import kotlin.math.hypot
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 /**
  * A Swerve Drive chassis.
@@ -45,21 +39,8 @@ open class SwerveDrive(
   protected val ahrs: AHRS,
   override var maxLinearSpeed: Double,
   override var maxRotSpeed: Double,
-  protected val cameras: List<VisionSubsystem> = mutableListOf(),
   protected val field: Field2d
 ) : SubsystemBase(), HolonomicDrive {
-
-  /** Vision statistics */
-  protected val numTargets = DoubleArray(cameras.size)
-  protected val tagDistance = DoubleArray(cameras.size)
-  protected val avgAmbiguity = DoubleArray(cameras.size)
-  protected val heightError = DoubleArray(cameras.size)
-  protected val usedVision = BooleanArray(cameras.size)
-  protected val usedVisionSights = LongArray(cameras.size)
-  protected val rejectedVisionSights = LongArray(cameras.size)
-  var visionRunning = false
-
-  var enableVisionFusion = true
 
   /** The kinematics that convert [ChassisSpeeds] into multiple [SwerveModuleState] objects. */
   protected val kinematics = SwerveDriveKinematics(
@@ -70,16 +51,13 @@ open class SwerveDrive(
   var currentSpeeds = ChassisSpeeds()
 
   /** Current estimated vision pose */
-  var visionPose = DoubleArray(cameras.size * 3)
 
   /** Pose estimator that estimates the robot's position as a [Pose2d]. */
   protected val poseEstimator = SwerveDrivePoseEstimator(
     kinematics,
     ahrs.heading,
     getPositions(),
-    RobotConstants.INITIAL_POSE,
-    VisionConstants.ENCODER_TRUST,
-    VisionConstants.MULTI_TAG_TRUST
+    RobotConstants.INITIAL_POSE
   )
 
   init {
@@ -177,14 +155,6 @@ open class SwerveDrive(
       getPositions()
     )
 
-    val visionPoseCopy = visionPose.clone()
-
-    if (cameras.isNotEmpty()) localize()
-
-    visionRunning = visionPose[0] != visionPoseCopy[0] ||
-      visionPose[1] != visionPoseCopy[1] ||
-      visionPose[2] != visionPoseCopy[2]
-
     // Sets the robot's pose and individual module rotations on the SmartDashboard [Field2d] widget.
     setRobotPose()
   }
@@ -236,84 +206,12 @@ open class SwerveDrive(
     )
   }
 
-  protected open fun localize() = try {
-    for ((index, camera) in cameras.withIndex()) {
-      val result = camera.estimatedPose(Pose2d(pose.x, pose.y, ahrs.heading))
-      if (result.isPresent) {
-        val presentResult = result.get()
-        numTargets[index] = presentResult.targetsUsed.size.toDouble()
-        tagDistance[index] = 0.0
-        avgAmbiguity[index] = 0.0
-        heightError[index] = abs(presentResult.estimatedPose.z)
-
-        for (tag in presentResult.targetsUsed) {
-          val tagPose = camera.estimator.fieldTags.getTagPose(tag.fiducialId)
-          if (tagPose.isPresent) {
-            val estimatedToTag = presentResult.estimatedPose.minus(tagPose.get())
-            tagDistance[index] += sqrt(estimatedToTag.x.pow(2) + estimatedToTag.y.pow(2)) / numTargets[index]
-            avgAmbiguity[index] = tag.poseAmbiguity / numTargets[index]
-          } else {
-            tagDistance[index] = Double.MAX_VALUE
-            avgAmbiguity[index] = Double.MAX_VALUE
-            break
-          }
-        }
-
-        val estVisionPose = presentResult.estimatedPose.toPose2d()
-
-        visionPose[0 + 3 * index] = estVisionPose.x
-        visionPose[1 + 3 * index] = estVisionPose.y
-        visionPose[2 + 3 * index] = estVisionPose.rotation.radians
-
-        if (presentResult.timestampSeconds > 0 &&
-          avgAmbiguity[index] <= VisionConstants.MAX_AMBIGUITY &&
-          numTargets[index] < 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_SINGLE_TAG ||
-          numTargets[index] >= 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_MULTI_TAG + (numTargets[index] - 2) * VisionConstants.NUM_TAG_FACTOR &&
-          heightError[index] < VisionConstants.MAX_HEIGHT_ERR_METERS
-        ) {
-          if (enableVisionFusion) {
-            poseEstimator.addVisionMeasurement(
-              estVisionPose,
-              presentResult.timestampSeconds,
-              camera.getEstimationStdDevs(numTargets[index].toInt(), tagDistance[index])
-            )
-          }
-          usedVision[index] = true
-          usedVisionSights[index] += 1.toLong()
-        } else {
-          usedVision[index] = false
-          rejectedVisionSights[index] += 1.toLong()
-        }
-      }
-    }
-  } catch (e: Error) {
-    DriverStation.reportError(
-      "!!!!!!!!! VISION ERROR !!!!!!!",
-      e.stackTrace
-    )
-  }
-
   override fun initSendable(builder: SendableBuilder) {
     builder.publishConstString("1.0", "Poses and ChassisSpeeds")
     builder.addDoubleArrayProperty("1.1 Estimated Pose", { doubleArrayOf(pose.x, pose.y, pose.rotation.radians) }, null)
     builder.addDoubleArrayProperty("1.2 Current Chassis Speeds", { doubleArrayOf(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, currentSpeeds.omegaRadiansPerSecond) }, null)
     builder.addDoubleArrayProperty("1.3 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
     builder.addDoubleProperty("1.4 Max Recorded Speed", { maxSpeed }, null)
-
-    builder.publishConstString("2.0", "Vision Stats")
-    builder.addBooleanArrayProperty("2.1 Used Last Vision Estimate?", { usedVision }, null)
-    builder.addDoubleArrayProperty("2.2 Number of Targets", { numTargets }, null)
-    builder.addDoubleArrayProperty("2.3 Avg Tag Distance", { tagDistance }, null)
-    builder.addDoubleArrayProperty("2.4 Average Ambiguity", { avgAmbiguity }, null)
-    builder.addDoubleArrayProperty("2.5 Cam Height Error", { heightError }, null)
-    builder.addIntegerArrayProperty("2.6 Total Used Vision Sights", { usedVisionSights }, null)
-    builder.addIntegerArrayProperty("2.7 Total Rejected Vision Sights", { rejectedVisionSights }, null)
-    for ((index, _) in cameras.withIndex()) {
-      builder.addDoubleArrayProperty("2.8${1 + index} Vision Pose Cam $index", { visionPose.slice(IntRange(0 + 3 * index, 2 + 3 * index)).toDoubleArray() }, null)
-      println(index)
-    }
-    builder.addBooleanProperty("2.9 Enabled Vision Fusion", { enableVisionFusion }, null)
-    builder.addBooleanProperty("2.91 New Vision Measurement", { visionRunning }, null)
 
     builder.publishConstString("3.0", "Driving & Steering (Std Order FL, FR, BL, BR)")
     builder.addDoubleArrayProperty(
@@ -536,7 +434,6 @@ open class SwerveDrive(
           ahrs,
           RobotConstants.MAX_LINEAR_SPEED,
           RobotConstants.MAX_ROT_SPEED,
-          VisionConstants.ESTIMATORS,
           field
         )
       } else {
@@ -545,7 +442,6 @@ open class SwerveDrive(
           ahrs,
           RobotConstants.MAX_LINEAR_SPEED,
           RobotConstants.MAX_ROT_SPEED,
-          VisionConstants.ESTIMATORS,
           field
         )
       }

@@ -13,10 +13,8 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.control.vision.VisionSubsystem
 import frc.team449.robot2024.constants.RobotConstants
 import frc.team449.robot2024.constants.drives.MecanumConstants
-import frc.team449.robot2024.constants.vision.VisionConstants
 import frc.team449.system.AHRS
 import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.WrappedMotor
@@ -49,8 +47,7 @@ open class MecanumDrive(
   override var maxLinearSpeed: Double,
   override var maxRotSpeed: Double,
   private val feedForward: SimpleMotorFeedforward,
-  private val controller: () -> PIDController,
-  private val cameras: List<VisionSubsystem> = mutableListOf()
+  private val controller: () -> PIDController
 ) : HolonomicDrive, SubsystemBase() {
 
   private val flController = controller()
@@ -121,8 +118,6 @@ open class MecanumDrive(
     backLeftMotor.setVoltage(backLeftPID + backLeftFF)
     backRightMotor.setVoltage(backRightPID + backRightFF)
 
-    if (cameras.isNotEmpty()) localize()
-
     this.poseEstimator.update(
       ahrs.heading,
       getPositions()
@@ -152,18 +147,6 @@ open class MecanumDrive(
       backLeftMotor.velocity,
       backRightMotor.velocity
     )
-
-  private fun localize() {
-    for (camera in cameras) {
-      val result = camera.estimatedPose(Pose2d(pose.x, pose.y, ahrs.heading))
-      if (result.isPresent) {
-        poseEstimator.addVisionMeasurement(
-          result.get().estimatedPose.toPose2d(),
-          result.get().timestampSeconds
-        )
-      }
-    }
-  }
 
   companion object {
 
@@ -197,7 +180,6 @@ open class MecanumDrive(
         RobotConstants.MAX_ROT_SPEED,
         SimpleMotorFeedforward(MecanumConstants.DRIVE_KS, MecanumConstants.DRIVE_KV, MecanumConstants.DRIVE_KA),
         { PIDController(MecanumConstants.DRIVE_KP, MecanumConstants.DRIVE_KI, MecanumConstants.DRIVE_KD) },
-        VisionConstants.ESTIMATORS
       )
     }
   }

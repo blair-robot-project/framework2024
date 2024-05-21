@@ -9,26 +9,6 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
   fun routineMap(): HashMap<String, Command> {
     return hashMapOf(
       "DoNothing" to DoNothing(robot).createCommand(),
-      "Red3PieceMid" to Experimental3PieceMid(robot, true).createCommand(),
-      "Blue3PieceMid" to Experimental3PieceMid(robot, false).createCommand(),
-      "RedSubwoofer5Piece" to FivePieceSubwooferMiddy(robot, true).createCommand(),
-      "BlueSubwoofer5Piece" to FivePieceSubwooferMiddy(robot, false).createCommand(),
-      "RedSubwoofer5PieceFarthy" to FivePieceSubwooferFarthy(robot, true).createCommand(),
-      "BlueSubwoofer5PieceFarthy" to FivePieceSubwooferFarthy(robot, false).createCommand(),
-      "RedSubwoofer5PieceCenty" to FivePieceSubwooferCenty(robot, true).createCommand(),
-      "BlueSubwoofer5PieceCenty" to FivePieceSubwooferCenty(robot, false).createCommand(),
-      "RedSixPiece" to SixPiece(robot, true).createCommand(),
-      "BlueSixPiece" to SixPiece(robot, false).createCommand(),
-      "RedFourPieceHelper" to FourPieceHelper(robot, true).createCommand(),
-      "BlueFourPieceHelper" to FourPieceHelper(robot, false).createCommand(),
-      "RedFourPieceAmp" to FourPieceAmpHelper(robot, true).createCommand(),
-      "BlueFourPieceAmp" to FourPieceAmpHelper(robot, false).createCommand(),
-      "RedWorld" to World(robot, true).createCommand(),
-      "BlueWorld" to World(robot, false).createCommand(),
-      "RedWorld3" to World3(robot, true).createCommand(),
-      "BlueWorld3" to World3(robot, false).createCommand(),
-      "Red4" to FourPiece(robot, true).createCommand(),
-      "Blue4" to FourPiece(robot, false).createCommand()
     )
   }
 
