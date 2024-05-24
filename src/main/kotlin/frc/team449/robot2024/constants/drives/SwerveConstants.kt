@@ -1,6 +1,9 @@
 package frc.team449.robot2024.constants.drives
 
+import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.util.Units
+import frc.team449.robot2024.constants.MotorConstants
+import frc.team449.robot2024.constants.RobotConstants
 
 object SwerveConstants {
   const val EFFICIENCY = 0.95
@@ -32,29 +35,37 @@ object SwerveConstants {
   const val TURN_KI = 0.0
   const val TURN_KD = 0.0
 
-  /** Feed forward values for driving each module */
-  const val DRIVE_KS = 0.20285 + 0.02
-  const val DRIVE_KV = 2.3887 + 0.2 + 0.0935
-  const val DRIVE_KA = 0.43365 + 0.035 + 0.0185
-
   // TODO: Figure out this value
   const val STEER_KS = 0.05
 
   /** PID gains for driving each module*/
-  const val DRIVE_KP = 0.05 //0.475
+  const val DRIVE_KP = 0.35
   const val DRIVE_KI = 0.0
   const val DRIVE_KD = 0.0
 
-  /** Drive configuration */
-  const val DRIVE_GEARING = (14.0 / 50.0) * (28.0 / 16.0) * (15.0 / 45.0)
+  /** Drive configuration, L2 for this bot */
+  const val DRIVE_GEARING = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0)
   const val DRIVE_UPR = 0.31818905832
   const val TURN_UPR = 2 * Math.PI
-  val MAX_ATTAINABLE_MK4I_SPEED = Units.feetToMeters(15.85) // (12 - DRIVE_KS) / DRIVE_KV
+  val MAX_ATTAINABLE_MK4I_SPEED = Units.feetToMeters(15.0) // (12 - DRIVE_KS) / DRIVE_KV
   const val DRIVE_CURRENT_LIM = 55
   const val STEERING_CURRENT_LIM = 40
   const val JOYSTICK_FILTER_ORDER = 2
   const val ROT_FILTER_ORDER = 1.25
   const val SKEW_CONSTANT = 11.5
+
+  /** Feed forward values for driving each module */
+  const val DRIVE_KS = 0.15
+  val DRIVE_KV = 12.0 / MAX_ATTAINABLE_MK4I_SPEED
+  val DRIVE_KA = 12.0 / (4 * DCMotor(
+    MotorConstants.NOMINAL_VOLTAGE,
+    MotorConstants.STALL_TORQUE * EFFICIENCY,
+    MotorConstants.STALL_CURRENT,
+    MotorConstants.FREE_CURRENT,
+    MotorConstants.FREE_SPEED,
+    1
+  ).getTorque(DRIVE_CURRENT_LIM.toDouble()) /
+    (Units.inchesToMeters(2.0) * RobotConstants.ROBOT_WEIGHT * DRIVE_GEARING))
 
   /** Wheelbase = wheel-to-wheel distance from front to back of the robot */
   /** Trackwidth = wheel-to-wheel distance from side to side of the robot */

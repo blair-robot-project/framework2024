@@ -21,20 +21,23 @@ object RobotConstants {
   val SNAP_TO_ANGLE_TOLERANCE_RAD = Units.degreesToRadians(3.5)
 
   /** In kilograms, include bumpers and battery and all */
-  const val ROBOT_WEIGHT = 55.0
+  val ROBOT_WEIGHT = Units.lbsToKilograms(55.0)
 
   /** Drive configuration */
   val MAX_LINEAR_SPEED = SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED // m/s
   const val MAX_ROT_SPEED = 9 * PI / 4 // rad/s
-  val MAX_ACCEL = 4 * DCMotor(
-    MotorConstants.NOMINAL_VOLTAGE,
-    MotorConstants.STALL_TORQUE * SwerveConstants.EFFICIENCY,
-    MotorConstants.STALL_CURRENT,
-    MotorConstants.FREE_CURRENT,
-    MotorConstants.FREE_SPEED,
-    1
-  ).getTorque(75.0) /
-    ((SwerveConstants.DRIVE_UPR / (2 * PI)) * ROBOT_WEIGHT * SwerveConstants.DRIVE_GEARING) // m/s/s
+
+  /** Artifiically limit it to whiplash accel, uncomment the stuff to limit at accel of motor @60A */
+  val MAX_ACCEL = 12.280406076432751
+//    4 * DCMotor(
+//    MotorConstants.NOMINAL_VOLTAGE,
+//    MotorConstants.STALL_TORQUE * SwerveConstants.EFFICIENCY,
+//    MotorConstants.STALL_CURRENT,
+//    MotorConstants.FREE_CURRENT,
+//    MotorConstants.FREE_SPEED,
+//    1
+//  ).getTorque(60.0) /
+//    ((SwerveConstants.DRIVE_UPR / (2 * PI)) * ROBOT_WEIGHT * SwerveConstants.DRIVE_GEARING) // m/s/s
 
   val INITIAL_POSE = Pose2d(0.0, 0.0, Rotation2d())
 
