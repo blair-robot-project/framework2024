@@ -1,11 +1,9 @@
 package frc.team449.control.holonomic
 
-import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.controller.SimpleMotorFeedforward
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
@@ -31,7 +29,6 @@ import kotlin.math.hypot
  * @param ahrs The gyro that is mounted on the chassis.
  * @param maxLinearSpeed The maximum translation speed of the chassis.
  * @param maxRotSpeed The maximum rotation speed of the chassis.
- * @param cameras The cameras that help estimate the robot's pose.
  * @param field The SmartDashboard [Field2d] widget that shows the robot's pose.
  */
 open class SwerveDrive(
@@ -91,7 +88,6 @@ open class SwerveDrive(
       this.kinematics.toSwerveModuleStates(this.desiredSpeeds)
 
     // Scale down module speed if a module is going faster than the max speed, and prevent early desaturation.
-//    normalizeDrive(desiredModuleStates, desiredSpeeds)
     SwerveDriveKinematics.desaturateWheelSpeeds(
       desiredModuleStates,
       SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED,
@@ -111,20 +107,6 @@ open class SwerveDrive(
       it.setVoltage(volts)
     }
   }
-
-  fun getModuleVel(): Double {
-    var totalVel = 0.0
-    modules.forEach { totalVel += it.state.speedMetersPerSecond }
-    return totalVel / modules.size
-  }
-
-  /** The measured pitch of the robot from the gyro sensor. */
-  val pitch: Rotation2d
-    get() = Rotation2d(MathUtil.angleModulus(ahrs.pitch.radians))
-
-  /** The measured roll of the robot from the gyro sensor. */
-  val roll: Rotation2d
-    get() = Rotation2d(MathUtil.angleModulus(ahrs.roll.radians))
 
   /** The (x, y, theta) position of the robot on the field. */
   override var pose: Pose2d
@@ -179,28 +161,28 @@ open class SwerveDrive(
 
     this.field.getObject("FL").pose = this.pose.plus(
       Transform2d(
-        Translation2d(SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, SwerveConstants.TRACKWIDTH / 2),
+        Translation2d(SwerveConstants.WHEELBASE / 2, SwerveConstants.TRACKWIDTH / 2),
         this.getPositions()[0].angle
       )
     )
 
     this.field.getObject("FR").pose = this.pose.plus(
       Transform2d(
-        Translation2d(SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, -SwerveConstants.TRACKWIDTH / 2),
+        Translation2d(SwerveConstants.WHEELBASE / 2, -SwerveConstants.TRACKWIDTH / 2),
         this.getPositions()[1].angle
       )
     )
 
     this.field.getObject("BL").pose = this.pose.plus(
       Transform2d(
-        Translation2d(-SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, SwerveConstants.TRACKWIDTH / 2),
+        Translation2d(-SwerveConstants.WHEELBASE / 2, SwerveConstants.TRACKWIDTH / 2),
         this.getPositions()[2].angle
       )
     )
 
     this.field.getObject("BR").pose = this.pose.plus(
       Transform2d(
-        Translation2d(-SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, -SwerveConstants.TRACKWIDTH / 2),
+        Translation2d(-SwerveConstants.WHEELBASE / 2, -SwerveConstants.TRACKWIDTH / 2),
         this.getPositions()[0].angle
       )
     )
@@ -365,7 +347,7 @@ open class SwerveDrive(
           driveMotorController(),
           turnMotorController(),
           driveFeedforward,
-          Translation2d(SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, SwerveConstants.TRACKWIDTH / 2)
+          Translation2d(SwerveConstants.WHEELBASE / 2, SwerveConstants.TRACKWIDTH / 2)
         ),
         SwerveModule.create(
           "FRModule",
@@ -385,7 +367,7 @@ open class SwerveDrive(
           driveMotorController(),
           turnMotorController(),
           driveFeedforward,
-          Translation2d(SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, -SwerveConstants.TRACKWIDTH / 2)
+          Translation2d(SwerveConstants.WHEELBASE / 2, -SwerveConstants.TRACKWIDTH / 2)
         ),
         SwerveModule.create(
           "BLModule",
@@ -405,7 +387,7 @@ open class SwerveDrive(
           driveMotorController(),
           turnMotorController(),
           driveFeedforward,
-          Translation2d(-SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, SwerveConstants.TRACKWIDTH / 2)
+          Translation2d(-SwerveConstants.WHEELBASE / 2, SwerveConstants.TRACKWIDTH / 2)
         ),
         SwerveModule.create(
           "BRModule",
@@ -425,7 +407,7 @@ open class SwerveDrive(
           driveMotorController(),
           turnMotorController(),
           driveFeedforward,
-          Translation2d(-SwerveConstants.WHEELBASE / 2 - SwerveConstants.X_SHIFT, -SwerveConstants.TRACKWIDTH / 2)
+          Translation2d(-SwerveConstants.WHEELBASE / 2, -SwerveConstants.TRACKWIDTH / 2)
         )
       )
       return if (isReal()) {
