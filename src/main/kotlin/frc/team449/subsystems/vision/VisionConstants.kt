@@ -2,6 +2,7 @@ package frc.team449.subsystems.vision
 
 import edu.wpi.first.apriltag.AprilTag
 import edu.wpi.first.apriltag.AprilTagFieldLayout
+import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.MatBuilder
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.Nat
@@ -15,26 +16,22 @@ import edu.wpi.first.math.util.Units
 import frc.team449.control.vision.ApriltagCamera
 import org.photonvision.estimation.TargetModel
 import org.photonvision.simulation.VisionSystemSim
-import kotlin.math.PI
 
 /** Constants that have anything to do with vision */
 object VisionConstants {
   /** How the tags are laid out on the field (their locations and ids) */
   private val TEST_TAG_LAYOUT = AprilTagFieldLayout(
     listOf(
-      AprilTag(5, Pose3d(16.3576, 4.532, 0.494, Rotation3d(0.0, 0.0, PI))),
-      AprilTag(6, Pose3d(0.1016, 4.532, 0.494, Rotation3d(0.0, 0.0, 0.0)))
+      AprilTag(3, Pose3d())
     ),
     16.4846,
     8.1026
   )
 
-  val TAG_LAYOUT: AprilTagFieldLayout = TEST_TAG_LAYOUT
-
   /** WPILib's AprilTagFieldLayout for the 2024 Crescendo Game */
-//  val TAG_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
-//    AprilTagFields.k2024Crescendo.m_resourceFile
-//  )
+  val TAG_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
+    AprilTagFields.k2024Crescendo.m_resourceFile
+  )
 
   /** Robot to Camera distance */
   val backLeft = Transform3d(
@@ -56,7 +53,7 @@ object VisionConstants {
   const val MAX_AMBIGUITY = 0.25
   var MAX_DISTANCE_SINGLE_TAG = 5.0
   var MAX_DISTANCE_MULTI_TAG = 6.0
-  val TAG_HEADING_MAX_DEV_RAD = Units.degreesToRadians(5.0)
+  val TAG_HEADING_MAX_DEV_RAD = Units.radiansToDegrees(5.0)
   var MAX_HEIGHT_ERR_METERS = 0.25
   const val NUM_TAG_FACTOR = 2.0
 
