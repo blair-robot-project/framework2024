@@ -175,17 +175,17 @@ class PoseSubsystem(
       )
     ) < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
       abs(
-        MathUtil.angleModulus(
-          MathUtil.angleModulus(visionPoseRot.radians) -
-            MathUtil.angleModulus(ahrs.heading.radians)
-        )
-      ) + 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
+      MathUtil.angleModulus(
+        MathUtil.angleModulus(visionPoseRot.radians) -
+          MathUtil.angleModulus(ahrs.heading.radians)
+      )
+    ) + 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
       abs(
-        MathUtil.angleModulus(
-          MathUtil.angleModulus(visionPoseRot.radians) -
-            MathUtil.angleModulus(ahrs.heading.radians)
-        )
-      ) - 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD
+      MathUtil.angleModulus(
+        MathUtil.angleModulus(visionPoseRot.radians) -
+          MathUtil.angleModulus(ahrs.heading.radians)
+      )
+    ) - 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD
   }
 
   private fun setRobotPose() {
