@@ -319,15 +319,21 @@
               "open": true
             }
           },
-          "driveCommand": {
-            "open": true
-          },
           "intake": {
             "double[]##v_/Monologuing/robot/intake/3.1 Intake 3D Position": {
               "open": true
             }
           },
-          "open": true
+          "open": true,
+          "poseSubsystem": {
+            "double[]##v_/Monologuing/robot/poseSubsystem/1.1 Estimated Pose": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/poseSubsystem/2.81 Vision Pose Cam 0": {
+              "open": true
+            },
+            "open": true
+          }
         }
       },
       "Shuffleboard": {

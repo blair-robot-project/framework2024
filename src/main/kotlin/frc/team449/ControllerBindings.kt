@@ -1,16 +1,10 @@
 package frc.team449
 
-import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.units.Units.Seconds
-import edu.wpi.first.units.Units.Volts
-import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
-import frc.team449.commands.Commands
 import frc.team449.subsystems.RobotConstants
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI

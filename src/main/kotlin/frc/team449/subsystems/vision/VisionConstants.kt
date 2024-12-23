@@ -2,6 +2,7 @@ package frc.team449.subsystems.vision
 
 import edu.wpi.first.apriltag.AprilTag
 import edu.wpi.first.apriltag.AprilTagFieldLayout
+import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.MatBuilder
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.Nat
@@ -13,6 +14,7 @@ import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.math.util.Units
 import frc.team449.control.vision.ApriltagCamera
+import frc.team449.subsystems.vision.interpolation.InterpolatedVisionDataset
 import org.photonvision.estimation.TargetModel
 import org.photonvision.simulation.VisionSystemSim
 import kotlin.math.PI
@@ -29,12 +31,17 @@ object VisionConstants {
     8.1026
   )
 
-  val TAG_LAYOUT: AprilTagFieldLayout = TEST_TAG_LAYOUT
+  val interpolatedVisionSets = listOf(
+    InterpolatedVisionDataset.HOME1,
+    InterpolatedVisionDataset.HOME2
+  )
+
+//  val TAG_LAYOUT: AprilTagFieldLayout = TEST_TAG_LAYOUT
 
   /** WPILib's AprilTagFieldLayout for the 2024 Crescendo Game */
-//  val TAG_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
-//    AprilTagFields.k2024Crescendo.m_resourceFile
-//  )
+  val TAG_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
+    AprilTagFields.k2024Crescendo.m_resourceFile
+  )
 
   /** Robot to Camera distance */
   val backLeft = Transform3d(

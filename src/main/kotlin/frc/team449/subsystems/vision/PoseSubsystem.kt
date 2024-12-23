@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.control.vision.ApriltagCamera
 import frc.team449.subsystems.RobotConstants
 import frc.team449.subsystems.drive.swerve.SwerveDrive
+import frc.team449.subsystems.vision.interpolation.InterpolatedVision
 import frc.team449.system.AHRS
 import kotlin.math.PI
 import kotlin.math.abs
@@ -145,8 +146,10 @@ class PoseSubsystem(
             heightError[index] < VisionConstants.MAX_HEIGHT_ERR_METERS
           ) {
             if (enableVisionFusion) {
+              val interpolatedPose = InterpolatedVision.interpolatePose(estVisionPose, index)
+
               poseEstimator.addVisionMeasurement(
-                estVisionPose,
+                interpolatedPose,
                 presentResult.timestampSeconds,
                 camera.getEstimationStdDevs(numTargets[index].toInt(), tagDistance[index])
               )
@@ -175,17 +178,17 @@ class PoseSubsystem(
       )
     ) < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
       abs(
-        MathUtil.angleModulus(
-          MathUtil.angleModulus(visionPoseRot.radians) -
-            MathUtil.angleModulus(ahrs.heading.radians)
-        )
-      ) + 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
+      MathUtil.angleModulus(
+        MathUtil.angleModulus(visionPoseRot.radians) -
+          MathUtil.angleModulus(ahrs.heading.radians)
+      )
+    ) + 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
       abs(
-        MathUtil.angleModulus(
-          MathUtil.angleModulus(visionPoseRot.radians) -
-            MathUtil.angleModulus(ahrs.heading.radians)
-        )
-      ) - 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD
+      MathUtil.angleModulus(
+        MathUtil.angleModulus(visionPoseRot.radians) -
+          MathUtil.angleModulus(ahrs.heading.radians)
+      )
+    ) - 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD
   }
 
   private fun setRobotPose() {
