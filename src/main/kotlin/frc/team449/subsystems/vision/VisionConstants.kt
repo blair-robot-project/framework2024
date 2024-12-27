@@ -24,8 +24,7 @@ object VisionConstants {
   /** How the tags are laid out on the field (their locations and ids) */
   private val TEST_TAG_LAYOUT = AprilTagFieldLayout(
     listOf(
-      AprilTag(5, Pose3d(16.3576, 4.532, 0.494, Rotation3d(0.0, 0.0, PI))),
-      AprilTag(6, Pose3d(0.1016, 4.532, 0.494, Rotation3d(0.0, 0.0, 0.0)))
+      AprilTag(3, Pose3d())
     ),
     16.4846,
     8.1026
@@ -94,12 +93,12 @@ object VisionConstants {
       backLeft,
       VISION_SIM
     ),
-//    ApriltagCamera(
-//      "back_right",
-//      TAG_LAYOUT,
-//      backRight,
-//      VISION_SIM
-//    )
+    ApriltagCamera(
+      "back_right",
+      TAG_LAYOUT,
+      backRight,
+      VISION_SIM
+    )
   )
 
   val ENCODER_TRUST: Matrix<N3, N1> = MatBuilder.fill(Nat.N3(), Nat.N1(), .125, .125, .0125)

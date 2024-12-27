@@ -68,7 +68,7 @@ class PIDPoseAlign(
   }
 
   override fun execute() {
-    val currTime = timer.get()
+
 
     drivetrain.set(calculate(poseSubsystem.pose, pose))
   }

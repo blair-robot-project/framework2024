@@ -36,6 +36,7 @@ deploy {
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
+                    deleteOldFiles = true
                 }
             }
         }
@@ -121,7 +122,7 @@ sourceSets {
 }
 
 wrapper {
-    gradleVersion = '8.11'
+    gradleVersion = '8.11.1'
 }
 
 // pre-commit hook to format

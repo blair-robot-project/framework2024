@@ -13,6 +13,8 @@ import monologue.Logged
 
 class Robot : RobotBase(), Logged {
 
+  //fiusdhgniofslkbndo;klbnsr g
+
   val driveController = CommandXboxController(0)
 
   val mechController = CommandXboxController(1)
