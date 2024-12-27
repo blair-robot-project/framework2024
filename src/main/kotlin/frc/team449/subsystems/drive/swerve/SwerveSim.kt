@@ -1,6 +1,8 @@
 package frc.team449.subsystems.drive.swerve
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.Timer.getFPGATimestamp
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import kotlin.math.hypot
@@ -15,6 +17,15 @@ class SwerveSim(
 
   private var lastTime = getFPGATimestamp()
   var currHeading = Rotation2d()
+
+  private val odometryTracker = SwerveDriveOdometry(
+    kinematics,
+    currHeading,
+    getPositions(),
+    Pose2d()
+  )
+
+  var odometryPose = odometryTracker.poseMeters
 
   override fun periodic() {
     val currTime = getFPGATimestamp()
@@ -34,6 +45,20 @@ class SwerveSim(
       )
     )
 
+    odometryPose = odometryTracker.update(
+      currHeading,
+      getPositions()
+    )
+
+
     speedMagnitude = hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
+  }
+
+  fun resetOdometryOnly(pose: Pose2d) {
+    odometryTracker.resetPosition(
+      currHeading,
+      getPositions(),
+      pose
+    )
   }
 }

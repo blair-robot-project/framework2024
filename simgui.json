@@ -329,7 +329,19 @@
             "double[]##v_/Monologuing/robot/poseSubsystem/1.1 Estimated Pose": {
               "open": true
             },
+            "double[]##v_/Monologuing/robot/poseSubsystem/2.3 Avg Tag Distance": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/poseSubsystem/2.4 Average Ambiguity": {
+              "open": true
+            },
             "double[]##v_/Monologuing/robot/poseSubsystem/2.81 Vision Pose Cam 0": {
+              "open": true
+            },
+            "int[]##v_/Monologuing/robot/poseSubsystem/2.6 Total Used Vision Sights": {
+              "open": true
+            },
+            "int[]##v_/Monologuing/robot/poseSubsystem/2.7 Total Rejected Vision Sights": {
               "open": true
             },
             "open": true

@@ -1,13 +1,17 @@
 package frc.team449
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.subsystems.RobotConstants
+import frc.team449.subsystems.drive.swerve.SwerveSim
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
+import kotlin.random.Random
 
 class ControllerBindings(
   private val driveController: CommandXboxController,
@@ -22,6 +26,8 @@ class ControllerBindings(
   private fun nonRobotBindings() {
     // slowDrive()
 
+    if (RobotBase.isSimulation()) resetOdometrySim()
+
     resetGyro()
   }
 
@@ -34,6 +40,21 @@ class ControllerBindings(
         .andThen(
           InstantCommand({ robot.drive.maxRotSpeed = RobotConstants.MAX_ROT_SPEED })
         )
+    )
+  }
+
+  private fun resetOdometrySim() {
+    driveController.a().onTrue(
+      InstantCommand({
+        robot.drive as SwerveSim
+        robot.drive.resetOdometryOnly(
+          Pose2d(
+            robot.drive.odometryPose.x + Random.nextDouble(-1.0, 1.0),
+            robot.drive.odometryPose.y + Random.nextDouble(-1.0, 1.0),
+            robot.drive.odometryPose.rotation
+          )
+        )
+      })
     )
   }
 

@@ -32,8 +32,8 @@ object VisionConstants {
   )
 
   val interpolatedVisionSets = listOf(
-    InterpolatedVisionDataset.HOME1,
-    InterpolatedVisionDataset.HOME2
+    InterpolatedVisionDataset.HOMELEFT,
+    InterpolatedVisionDataset.HOMERIGHT
   )
 
 //  val TAG_LAYOUT: AprilTagFieldLayout = TEST_TAG_LAYOUT
@@ -94,12 +94,12 @@ object VisionConstants {
       backLeft,
       VISION_SIM
     ),
-    ApriltagCamera(
-      "back_right",
-      TAG_LAYOUT,
-      backRight,
-      VISION_SIM
-    )
+//    ApriltagCamera(
+//      "back_right",
+//      TAG_LAYOUT,
+//      backRight,
+//      VISION_SIM
+//    )
   )
 
   val ENCODER_TRUST: Matrix<N3, N1> = MatBuilder.fill(Nat.N3(), Nat.N1(), .125, .125, .0125)

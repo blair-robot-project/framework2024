@@ -14,6 +14,7 @@ import frc.team449.commands.light.BlairChasing
 import frc.team449.commands.light.BreatheHue
 import frc.team449.commands.light.Rainbow
 import frc.team449.subsystems.FieldConstants
+import frc.team449.subsystems.drive.swerve.SwerveSim
 import frc.team449.subsystems.vision.VisionConstants
 import monologue.Annotations.Log
 import monologue.Logged
@@ -161,8 +162,10 @@ class RobotLoop : TimedRobot(), Logged {
   override fun simulationInit() {}
 
   override fun simulationPeriodic() {
+    robot.drive as SwerveSim
+
     VisionConstants.ESTIMATORS.forEach {
-      it.simulationPeriodic(robot.poseSubsystem.pose)
+      it.simulationPeriodic(robot.drive.odometryPose)
     }
 
     VisionConstants.VISION_SIM.debugField.getObject("EstimatedRobot").pose = robot.poseSubsystem.pose

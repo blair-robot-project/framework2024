@@ -28,10 +28,11 @@ object RobotConstants {
 
   const val USE_ACCEL_LIMIT = true
 
-  val MAX_ACCEL = 4 *
-    DCMotor.getNEO(1)
-      .getTorque(75.0) /
-    ((SwerveConstants.DRIVE_UPR / (2 * PI)) * ROBOT_WEIGHT * SwerveConstants.DRIVE_GEARING) // m/s/s
+  val MAX_ACCEL = 25.0
+//    4 *
+//    DCMotor.getNEO(1)
+//      .getTorque(75.0) /
+//    ((SwerveConstants.DRIVE_UPR / (2 * PI)) * ROBOT_WEIGHT * SwerveConstants.DRIVE_GEARING) // m/s/s
 
   val INITIAL_POSE = Pose2d(0.0, 0.0, Rotation2d())
 
