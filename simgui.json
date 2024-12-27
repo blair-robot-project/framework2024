@@ -61,6 +61,7 @@
       "/Monologuing/field": "Field2d",
       "/Monologuing/robot/closeToShooterInfrared": "Digital Input",
       "/Monologuing/robot/elevator/mech": "Mechanism2d",
+      "/Monologuing/robot/field": "Field2d",
       "/Monologuing/robot/infrared": "Digital Input",
       "/Monologuing/routineChooser": "String Chooser",
       "/Monologuing/scheduler": "Scheduler",

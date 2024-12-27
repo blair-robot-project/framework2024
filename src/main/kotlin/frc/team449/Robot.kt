@@ -13,8 +13,6 @@ import monologue.Logged
 
 class Robot : RobotBase(), Logged {
 
-  //fiusdhgniofslkbndo;klbnsr g
-
   val driveController = CommandXboxController(0)
 
   val mechController = CommandXboxController(1)
@@ -22,7 +20,6 @@ class Robot : RobotBase(), Logged {
   val ahrs = AHRS()
 
   // Instantiate/declare PDP and other stuff here
-
   @Log.NT
   override val powerDistribution: PowerDistribution = PowerDistribution(
     RobotConstants.PDH_CAN,

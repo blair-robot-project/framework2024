@@ -17,7 +17,6 @@ import frc.team449.control.vision.ApriltagCamera
 import frc.team449.subsystems.vision.interpolation.InterpolatedVisionDataset
 import org.photonvision.estimation.TargetModel
 import org.photonvision.simulation.VisionSystemSim
-import kotlin.math.PI
 
 /** Constants that have anything to do with vision */
 object VisionConstants {

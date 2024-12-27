@@ -50,7 +50,6 @@ class SwerveSim(
       getPositions()
     )
 
-
     speedMagnitude = hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
   }
 

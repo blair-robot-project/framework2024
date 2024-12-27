@@ -68,8 +68,6 @@ class PIDPoseAlign(
   }
 
   override fun execute() {
-
-
     drivetrain.set(calculate(poseSubsystem.pose, pose))
   }
 
