@@ -154,7 +154,7 @@ fun createKraken(
     motor.velocity,
     motor.motorVoltage,
     motor.supplyCurrent,
-    motor.torqueCurrent,
+    motor.statorCurrent,
     motor.deviceTemp
   )
 

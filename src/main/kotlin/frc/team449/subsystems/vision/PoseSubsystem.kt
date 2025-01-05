@@ -1,19 +1,23 @@
 package frc.team449.subsystems.vision
 
+import com.revrobotics.sim.MovingAverageFilterSim
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
+import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.control.vision.ApriltagCamera
 import frc.team449.subsystems.RobotConstants
 import frc.team449.subsystems.drive.swerve.SwerveDrive
+import frc.team449.subsystems.drive.swerve.SwerveSim
 import frc.team449.subsystems.vision.interpolation.InterpolatedVision
 import frc.team449.system.AHRS
 import kotlin.math.PI
@@ -27,6 +31,8 @@ class PoseSubsystem(
   private val drive: SwerveDrive,
   private val field: Field2d
 ) : SubsystemBase() {
+
+  private val isReal = RobotBase.isReal()
 
   private val poseEstimator = SwerveDrivePoseEstimator(
     drive.kinematics,
@@ -76,6 +82,8 @@ class PoseSubsystem(
       )
     }
 
+  var pureVisionPose: Pose2d = Pose2d()
+
   init {
     SmartDashboard.putData("Elastic Swerve Drive") { builder: SendableBuilder ->
       builder.setSmartDashboardType("SwerveDrive")
@@ -96,10 +104,18 @@ class PoseSubsystem(
   }
 
   override fun periodic() {
-    this.poseEstimator.update(
-      ahrs.heading,
-      drive.getPositions()
-    )
+    if (isReal) {
+      this.poseEstimator.update(
+        ahrs.heading,
+        drive.getPositions()
+      )
+    } else {
+      drive as SwerveSim
+      this.poseEstimator.update(
+        drive.currHeading,
+        drive.getPositions()
+      )
+    }
 
     if (cameras.isNotEmpty()) localize()
 
@@ -171,26 +187,26 @@ class PoseSubsystem(
   }
 
   private fun inGyroTolerance(visionPoseRot: Rotation2d): Boolean {
+    val currHeadingRad = if (isReal) {
+      ahrs.heading.radians
+    } else {
+      drive as SwerveSim
+      drive.currHeading.radians
+    }
+
     val result = abs(
       MathUtil.angleModulus(
-        MathUtil.angleModulus(visionPoseRot.radians) -
-          MathUtil.angleModulus(ahrs.heading.radians)
+        MathUtil.angleModulus(visionPoseRot.radians) - MathUtil.angleModulus(currHeadingRad)
       )
-    ) < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
-      abs(
+    ) < VisionConstants.TAG_HEADING_MAX_DEV_RAD || abs(
       MathUtil.angleModulus(
-        MathUtil.angleModulus(visionPoseRot.radians) -
-          MathUtil.angleModulus(ahrs.heading.radians)
-      )
-    ) + 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD ||
-      abs(
+        MathUtil.angleModulus(visionPoseRot.radians) - MathUtil.angleModulus(currHeadingRad)
+      ) + 2 * PI
+    ) < VisionConstants.TAG_HEADING_MAX_DEV_RAD || abs(
       MathUtil.angleModulus(
-        MathUtil.angleModulus(visionPoseRot.radians) -
-          MathUtil.angleModulus(ahrs.heading.radians)
-      )
-    ) - 2 * PI < VisionConstants.TAG_HEADING_MAX_DEV_RAD
-
-    if (!result) println("OUT OF GYRO TOLERANCE")
+        MathUtil.angleModulus(visionPoseRot.radians) - MathUtil.angleModulus(currHeadingRad)
+      ) - 2 * PI
+    ) < VisionConstants.TAG_HEADING_MAX_DEV_RAD
 
     return result
   }

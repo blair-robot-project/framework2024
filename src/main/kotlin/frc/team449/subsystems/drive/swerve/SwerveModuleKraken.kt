@@ -139,6 +139,7 @@ open class SwerveModuleKraken(
         SwerveConstants.DRIVE_KP,
         SwerveConstants.DRIVE_KI,
         SwerveConstants.DRIVE_KD,
+        updateFrequency = SwerveConstants.VALUE_UPDATE_RATE
       )
       val turnMotor = createSparkMax(
         turnID,

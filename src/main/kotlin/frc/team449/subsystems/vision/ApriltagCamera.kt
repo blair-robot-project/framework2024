@@ -97,6 +97,10 @@ class ApriltagCamera(
     // Decrease std devs if multiple targets are visible
     if (numTags > 1) estStdDevs = VisionConstants.MULTI_TAG_TRUST.copy()
 
+//    println(estStdDevs.times(
+//      1 + avgDist.pow(VisionConstants.ORDER) * VisionConstants.PROPORTION
+//    )[0, 0])
+
     // Increase std devs based on (average) distance
     return estStdDevs.times(
       1 + avgDist.pow(VisionConstants.ORDER) * VisionConstants.PROPORTION
